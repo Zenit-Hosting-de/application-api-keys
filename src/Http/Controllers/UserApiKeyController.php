@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Zenit\ApplicationAPIKeys\Http\Requests\DeleteUserApiKeyRequest;
 use Zenit\ApplicationAPIKeys\Http\Requests\GetUserApiKeysRequest;
 use Zenit\ApplicationAPIKeys\Http\Requests\StoreUserApiKeyRequest;
-use Zenit\ApplicationAPIKeys\Transformers\ApiKeyTransformer;
+use Zenit\ApplicationAPIKeys\Data\ApiKeyData;
 
 class UserApiKeyController extends ApplicationApiController
 {
@@ -24,8 +24,8 @@ class UserApiKeyController extends ApplicationApiController
     {
         $apiKeys = $user->apiKeys()->latest('id')->get();
 
-        return $this->fractal->collection($apiKeys)
-            ->transformWith($this->getTransformer(ApiKeyTransformer::class))
+        return $this->response->collection($apiKeys)
+            ->transformWith(ApiKeyData::class)
             ->toArray();
     }
 
@@ -50,8 +50,8 @@ class UserApiKeyController extends ApplicationApiController
             ->property('identifier', $token->accessToken->identifier)
             ->log();
 
-        return $this->fractal->item($token->accessToken)
-            ->transformWith($this->getTransformer(ApiKeyTransformer::class))
+        return $this->response->item($token->accessToken)
+            ->transformWith(ApiKeyData::class)
             ->addMeta(['secret_token' => $token->plainTextToken])
             ->toArray();
     }
